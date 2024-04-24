@@ -23,9 +23,9 @@ class BookSellerGui extends JFrame {
 		p.add(titleField);
 		p.add(new JLabel("Price:"));
 		priceField = new JTextField(15);
-		shippingCostField = new JTextField(15);
 		p.add(priceField);
 		p.add(new JLabel("Shipping cost:"));
+		shippingCostField = new JTextField(15);
 
 		getContentPane().add(p, BorderLayout.CENTER);
 		
