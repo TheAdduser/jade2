@@ -16,6 +16,7 @@ public class BookBuyerAgent extends Agent {
   
   //list of found sellers
   private AID[] sellerAgents;
+  public int budget = 100;
   
 	protected void setup() {
 	  targetBookTitle = "";
@@ -128,16 +129,22 @@ public class BookBuyerAgent extends Agent {
 	      break;
 	    case 2:
 	      //best proposal consumption - purchase
-	      ACLMessage order = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
-          order.addReceiver(bestSeller);
-	      order.setContent(targetBookTitle);
-	      order.setConversationId("book-trade");
-	      order.setReplyWith("order"+System.currentTimeMillis());
-	      myAgent.send(order);
-	      mt = MessageTemplate.and(MessageTemplate.MatchConversationId("book-trade"),
-	                               MessageTemplate.MatchInReplyTo(order.getReplyWith()));
-	      step = 3;
-	      break;
+			if (budget > bestPrice) {
+				ACLMessage order = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
+				order.addReceiver(bestSeller);
+				order.setContent(targetBookTitle);
+				order.setConversationId("book-trade");
+				order.setReplyWith("order" + System.currentTimeMillis());
+				updateBudget(budget - bestPrice);
+				myAgent.send(order);
+				mt = MessageTemplate.and(MessageTemplate.MatchConversationId("book-trade"),
+						MessageTemplate.MatchInReplyTo(order.getReplyWith()));
+				step = 3;
+			} else {
+				System.out.println(getAID().getLocalName() + "Budget is to low!");
+				step = 4;
+			}
+	      	break;
 	    case 3:      
 	      //seller confirms the transaction
 	      reply = myAgent.receive(mt);
@@ -145,11 +152,14 @@ public class BookBuyerAgent extends Agent {
 	        if (reply.getPerformative() == ACLMessage.INFORM) {
 	          //purchase succeeded
 	          System.out.println(getAID().getLocalName() + ": " + targetBookTitle + " purchased for " + bestPrice + " from " + reply.getSender().getLocalName());
+			  	System.out.println(getAID().getLocalName() + "Your budget is: " + budget);
 		  System.out.println(getAID().getLocalName() + ": waiting for the next purchase order.");
 		  targetBookTitle = "";
 	          //myAgent.doDelete();
-	        }
-	        else {
+	        } else if(bestPrice > budget){
+				System.out.println();
+			}
+	        {
 	          System.out.println(getAID().getLocalName() + ": purchase has failed. " + targetBookTitle + " was sold in the meantime.");
 	        }
 	        step = 4;	//this state ends the purchase process
