@@ -128,7 +128,7 @@ public class BookBuyerAgent extends Agent {
 					}
 					break;
 				case 2:
-					if(budget > bestPrice) {
+					if(budget >= bestPrice) {
 						//best proposal consumption - purchase
 						ACLMessage order = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
 						order.addReceiver(bestSeller);
@@ -160,11 +160,13 @@ public class BookBuyerAgent extends Agent {
 						else {
 							System.out.println(getAID().getLocalName() + ": purchase has failed. " + targetBookTitle + " was sold in the meantime.");
 						}
-						step = 4;	//this state ends the purchase process
+						step = 4;//this state ends the purchase process
 					}
 					else {
 						block();
 					}
+					break;
+				case 4:
 					break;
 			}
 		}
